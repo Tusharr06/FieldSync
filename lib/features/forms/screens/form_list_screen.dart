@@ -16,6 +16,19 @@ class FormListScreen extends ConsumerWidget {
         title: const Text('FieldSync: Forms'),
         actions: [
           IconButton(
+            icon: const Icon(Icons.bug_report),
+            tooltip: 'Seed Sample Data',
+            onPressed: () {
+               ref.read(formControllerProvider).submitForm('debug_form', {
+                 'sample_field': 'Hello Firestore',
+                 'timestamp': DateTime.now().toIso8601String(),
+               });
+               ScaffoldMessenger.of(context).showSnackBar(
+                 const SnackBar(content: Text('Sample data seeded! Go to Status -> Sync.')),
+               );
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.sync_alt),
             tooltip: 'Sync Status',
             onPressed: () {

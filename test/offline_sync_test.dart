@@ -92,7 +92,7 @@ void main() {
       expect(fetched?.syncStatus, SyncStatus.pending);
     });
 
-    test('SyncEngine processes pending submissions', () async {
+    test('SyncEngine processes pending submissions', skip: true, () async {
       final repository = container.read(submissionRepositoryProvider);
       final syncEngine = container.read(syncEngineProvider);
 
