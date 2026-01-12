@@ -4,33 +4,70 @@ import '../controller/submission_controller.dart';
 import '../../../core/sync/sync_engine.dart';
 import '../models/submission_model.dart';
 
-class SubmissionStatusScreen extends ConsumerWidget {
+class SubmissionStatusScreen extends ConsumerStatefulWidget {
   const SubmissionStatusScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SubmissionStatusScreen> createState() => _SubmissionStatusScreenState();
+}
+
+class _SubmissionStatusScreenState extends ConsumerState<SubmissionStatusScreen> {
+  bool _isSyncing = false;
+
+  Future<void> _handleSync() async {
+    setState(() => _isSyncing = true);
+    try {
+      await ref.read(syncEngineProvider).syncData();
+      ref.invalidate(submissionListProvider);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Sync completed successfully!')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Sync failed: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isSyncing = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final submissionsAsync = ref.watch(submissionListProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Sync Status')),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () async {
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Syncing...')));
-            await ref.read(syncEngineProvider).syncData();
-            ref.invalidate(submissionListProvider);
-        },
-        label: const Text('Sync Now'),
-        icon: const Icon(Icons.cloud_upload),
+        onPressed: _isSyncing ? null : _handleSync,
+        label: _isSyncing ? const Text('Syncing...') : const Text('Sync Now'),
+        icon: _isSyncing 
+            ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) 
+            : const Icon(Icons.cloud_upload),
       ),
       body: submissionsAsync.when(
         data: (submissions) {
           if (submissions.isEmpty) {
-            return const Center(child: Text('No submissions found.'));
+            return const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.inbox, size: 64, color: Colors.grey),
+                  SizedBox(height: 16),
+                  Text('No submissions found.', style: TextStyle(color: Colors.grey, fontSize: 18)),
+                ],
+              ),
+            );
           }
           final sorted = List.of(submissions)..sort((a, b) => b.createdAt.compareTo(a.createdAt));
           
           return ListView.builder(
             itemCount: sorted.length,
+            // Add padding at bottom for FAB
+            padding: const EdgeInsets.only(bottom: 80), 
             itemBuilder: (context, index) {
               final sub = sorted[index];
               return Card(
