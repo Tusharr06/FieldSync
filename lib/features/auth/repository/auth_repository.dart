@@ -1,32 +1,38 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-abstract class AuthRepository {
-  Stream<User?> get authStateChanges;
-  Future<User?> signInWithEmail(String email, String password);
-  Future<void> signOut();
-}
-
-class FirebaseAuthRepository implements AuthRepository {
+class AuthRepository {
   final FirebaseAuth _firebaseAuth;
 
-  FirebaseAuthRepository(this._firebaseAuth);
+  AuthRepository(this._firebaseAuth);
 
-  @override
   Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
 
-  @override
-  Future<User?> signInWithEmail(String email, String password) async {
-    await Future.delayed(const Duration(seconds: 1));
-    return null;
+  User? get currentUser => _firebaseAuth.currentUser;
+
+  Future<void> signInWithEmailAndPassword(String email, String password) async {
+    await _firebaseAuth.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
   }
 
-  @override
+  Future<void> signUpWithEmailAndPassword(String email, String password) async {
+    await _firebaseAuth.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+  }
+
   Future<void> signOut() async {
     await _firebaseAuth.signOut();
   }
 }
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
-  return FirebaseAuthRepository(FirebaseAuth.instance);
+  return AuthRepository(FirebaseAuth.instance);
+});
+
+final authStateProvider = StreamProvider<User?>((ref) {
+  return ref.watch(authRepositoryProvider).authStateChanges;
 });

@@ -4,7 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'core/database/local_database.dart';
 import 'core/sync/sync_engine.dart';
-import 'features/forms/screens/form_list_screen.dart';
+import 'core/routing/app_router.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,7 +40,7 @@ class _FieldSyncAppState extends ConsumerState<FieldSyncApp> {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
         useMaterial3: true,
       ),
-      home: const FormListScreen(),
+      home: const AuthWrapper(),
     );
   }
 }

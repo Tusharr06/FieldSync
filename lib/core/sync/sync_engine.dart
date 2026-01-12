@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../features/submissions/repository/submission_repository.dart';
 import '../../features/submissions/models/submission_model.dart';
 import '../network/connectivity_service.dart';
@@ -52,8 +53,14 @@ class SyncEngine {
   Future<void> _processSubmission(SubmissionRepository repository, SubmissionModel submission) async {
      print('SyncEngine: Syncing submission ${submission.id}...');
      
+     final user = FirebaseAuth.instance.currentUser;
+     if (user == null) {
+       print('SyncEngine: Aborting sync. No logged-in user.');
+       return; 
+     }
+
      try {
-       final docRef = _firestore.collection(FirebasePaths.submissions).doc(submission.id);
+       final docRef = _firestore.collection(FirebasePaths.userSubmissions(user.uid)).doc(submission.id);
 
        final dataToUpload = {
          ...submission.toMap(),
