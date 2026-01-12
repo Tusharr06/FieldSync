@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../features/submissions/repository/submission_repository.dart';
 import '../../features/submissions/models/submission_model.dart';
+import '../../features/forms/repository/form_repository.dart';
 import '../network/connectivity_service.dart';
 import '../utils/firebase_paths.dart';
 
@@ -15,17 +16,12 @@ class SyncEngine {
       : _firestore = firestore ?? FirebaseFirestore.instance;
 
   void init() {
-    print('SyncEngine: Initializing...');
-    
     _ref.listen<AsyncValue<List<ConnectivityResult>>>(connectivityStatusProvider, (previous, next) {
       next.whenData((results) {
          final isConnected = results.any((result) => result != ConnectivityResult.none);
          
          if (isConnected) {
-           print('SyncEngine: Connection detected. Triggering sync...');
            syncData();
-         } else {
-           print('SyncEngine: No connection.');
          }
       });
     });
@@ -36,29 +32,26 @@ class SyncEngine {
     
     final pendingSubmissions = await repository.getPendingSubmissions();
     
-    if (pendingSubmissions.isEmpty) {
-      print('SyncEngine: No pending submissions to sync.');
-      return;
-    }
-
-    print('SyncEngine: Found ${pendingSubmissions.length} pending submissions.');
-
-    for (final submission in pendingSubmissions) {
-      if (submission.syncStatus == SyncStatus.draft) {
-        continue;
+    if (pendingSubmissions.isNotEmpty) {
+      for (final submission in pendingSubmissions) {
+        if (submission.syncStatus == SyncStatus.draft) {
+          continue;
+        }
+        await _processSubmission(repository, submission);
       }
-      await _processSubmission(repository, submission);
     }
-    
-    print('SyncEngine: Batch sync complete.');
+
+    try {
+      await _ref.read(formRepositoryProvider).syncForms();
+    } catch (e) {
+      // ignore: avoid_print
+      print('Sync failed: $e');
+    }
   }
 
   Future<void> _processSubmission(SubmissionRepository repository, SubmissionModel submission) async {
-     print('SyncEngine: Syncing submission ${submission.id}...');
-     
      final user = FirebaseAuth.instance.currentUser;
      if (user == null) {
-       print('SyncEngine: Aborting sync. No logged-in user.');
        return; 
      }
 
@@ -73,10 +66,8 @@ class SyncEngine {
        await docRef.set(dataToUpload, SetOptions(merge: true));
 
        await repository.updateSubmissionStatus(submission.id, SyncStatus.synced);
-       print('SyncEngine: Submission ${submission.id} SYNCED.');
        
      } catch (e) {
-       print('SyncEngine: Failed to sync submission ${submission.id}. Error: $e');
        await repository.updateSubmissionStatus(submission.id, SyncStatus.failed);
      }
   }

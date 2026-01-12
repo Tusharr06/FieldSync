@@ -40,18 +40,29 @@ class _SubmissionStatusScreenState extends ConsumerState<SubmissionStatusScreen>
   
   void _onSubmissionTap(SubmissionModel submission) {
     if (submission.syncStatus == SyncStatus.draft) {
-      final forms = ref.read(formListProvider);
-      try {
-        final form = forms.firstWhere((f) => f.id == submission.formId);
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => FormFillScreen(form: form)), 
-        );
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Form definition not found for ${submission.formId}')),
-        );
-      }
+      final formsAsync = ref.read(formListProvider);
+      
+      formsAsync.when(
+        data: (forms) {
+          try {
+            final form = forms.firstWhere((f) => f.id == submission.formId);
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => FormFillScreen(form: form)), 
+            );
+          } catch (e) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Form definition not found for ${submission.formId}')),
+            );
+          }
+        },
+        loading: () => ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Forms are still loading...')),
+        ),
+        error: (e, _) => ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error loading forms: $e')),
+        ),
+      );
     } else {
       Navigator.push(
         context,

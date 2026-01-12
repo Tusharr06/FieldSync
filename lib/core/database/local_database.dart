@@ -8,6 +8,7 @@ abstract class LocalDatabase {
   Future<List<Map<String, dynamic>>> getAll(String boxName);
   Future<void> delete(String boxName, String key);
   Future<void> clear(String boxName);
+  Stream<void> watch(String boxName);
 }
 
 class HiveLocalDatabase implements LocalDatabase {
@@ -74,6 +75,12 @@ class HiveLocalDatabase implements LocalDatabase {
   Future<void> clear(String boxName) async {
     final box = await _getBox(boxName);
     await box.clear();
+  }
+
+  @override
+  Stream<void> watch(String boxName) async* {
+    final box = await _getBox(boxName);
+    yield* box.watch().map((event) {});
   }
 }
 

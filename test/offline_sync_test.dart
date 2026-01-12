@@ -38,6 +38,9 @@ class MockLocalDatabase implements LocalDatabase {
   Future<void> clear(String boxName) async {
     _storage.clear();
   }
+
+  @override
+  Stream<void> watch(String boxName) => const Stream.empty();
 }
 
 class MockConnectivityService extends ConnectivityService {

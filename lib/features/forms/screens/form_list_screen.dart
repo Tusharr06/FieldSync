@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import '../../../../core/network/connectivity_service.dart';
 import '../controller/form_controller.dart';
+import 'form_builder_screen.dart';
 import 'form_fill_screen.dart';
 import '../../submissions/screens/submission_status_screen.dart';
 
@@ -11,7 +12,7 @@ class FormListScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final forms = ref.watch(formListProvider);
+    final formsAsync = ref.watch(formListProvider);
     final connectivityAsync = ref.watch(connectivityStatusProvider);
     
     final isOffline = connectivityAsync.maybeWhen(
@@ -36,13 +37,11 @@ class FormListScreen extends ConsumerWidget {
             icon: const Icon(Icons.bug_report),
             tooltip: 'Seed Sample Data',
             onPressed: () {
-               ref.read(formControllerProvider).submitForm('debug_form', {
-                 'sample_field': 'Hello Firestore',
-                 'timestamp': DateTime.now().toIso8601String(),
-               });
+               ref.read(formControllerProvider).seedDebugForms();
                ScaffoldMessenger.of(context).showSnackBar(
-                 const SnackBar(content: Text('Sample data seeded! Go to Status -> Sync.')),
+                 const SnackBar(content: Text('Sample data seeded! Refreshing...')),
                );
+               ref.invalidate(formListProvider);
             },
           ),
           IconButton(
@@ -57,38 +56,61 @@ class FormListScreen extends ConsumerWidget {
           )
         ],
       ),
-      body: forms.isEmpty 
-        ? const Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.description_outlined, size: 64, color: Colors.grey),
-                SizedBox(height: 16),
-                Text('No forms available', style: TextStyle(color: Colors.grey, fontSize: 18)),
-              ],
-            ),
-          )
-        : ListView.builder(
-        itemCount: forms.length,
-        itemBuilder: (context, index) {
-          final form = forms[index];
-          return Card(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: ListTile(
-              title: Text(form.title, style: const TextStyle(fontWeight: FontWeight.bold)),
-              subtitle: Text(form.description),
-              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => FormFillScreen(form: form),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const FormBuilderScreen()));
+        },
+        child: const Icon(Icons.add),
+      ),
+      body: formsAsync.when(
+        data: (forms) {
+          if (forms.isEmpty) {
+            return const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.description_outlined, size: 64, color: Colors.grey),
+                  SizedBox(height: 16),
+                  Text('No forms available', style: TextStyle(color: Colors.grey, fontSize: 18)),
+                ],
+              ),
+            );
+          }
+          return ListView.builder(
+            itemCount: forms.length,
+            itemBuilder: (context, index) {
+              final form = forms[index];
+              return Card(
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: ListTile(
+                  title: Text(form.title, style: const TextStyle(fontWeight: FontWeight.bold)),
+                  subtitle: Text(form.description),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                       if (!form.isSynced)
+                         const Padding(
+                           padding: EdgeInsets.only(right: 8.0),
+                           child: Icon(Icons.cloud_off, color: Colors.orange, size: 20),
+                         ),
+                       const Icon(Icons.arrow_forward_ios, size: 16),
+                    ],
                   ),
-                );
-              },
-            ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => FormFillScreen(form: form),
+                      ),
+                    );
+                  },
+                ),
+              );
+            },
           );
         },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, st) => Center(child: Text('Error: $e')),
       ),
     );
   }

@@ -40,6 +40,9 @@ class SubmissionRepository {
     final allData = await _localDatabase.getAll(_boxName);
     return allData.map((data) => SubmissionModel.fromMap(data)).toList();
   }
+  Stream<List<SubmissionModel>> watchSubmissions() {
+    return _localDatabase.watch(_boxName).asyncMap((_) => getAllSubmissions());
+  }
 }
 
 final submissionRepositoryProvider = Provider<SubmissionRepository>((ref) {
