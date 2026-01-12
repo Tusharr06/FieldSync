@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "978197217398",
+    "project_id": "fieldsync-47289",
+    "storage_bucket": "fieldsync-47289.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:978197217398:android:dbb50068e50fffb0fb5f57",
+        "android_client_info": {
+          "package_name": "com.example.fieldsync"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBJ8sdE7zjgeZsSQFeyBLkffo4FsinSDh4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
