@@ -4,7 +4,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import '../../../../core/network/connectivity_service.dart';
 import '../controller/form_controller.dart';
 import 'form_builder_screen.dart';
-import 'form_fill_screen.dart';
+import 'form_detail_screen.dart';
 import '../../submissions/screens/submission_status_screen.dart';
 
 class FormListScreen extends ConsumerWidget {
@@ -100,7 +100,7 @@ class FormListScreen extends ConsumerWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => FormFillScreen(form: form),
+                        builder: (_) => FormDetailScreen(form: form),
                       ),
                     );
                   },
