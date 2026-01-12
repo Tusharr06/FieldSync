@@ -1,15 +1,13 @@
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fieldsync/core/database/local_database.dart';
 import 'package:fieldsync/core/sync/sync_engine.dart';
 import 'package:fieldsync/core/network/connectivity_service.dart';
 import 'package:fieldsync/features/submissions/models/submission_model.dart';
 import 'package:fieldsync/features/submissions/repository/submission_repository.dart';
-import 'package:fieldsync/features/submissions/controller/submission_controller.dart';
+import 'package:fieldsync/features/forms/controller/form_controller.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
-// Mock LocalDatabase for testing purposes (in-memory)
 class MockLocalDatabase implements LocalDatabase {
   final Map<String, Map<String, dynamic>> _storage = {};
 
@@ -42,7 +40,6 @@ class MockLocalDatabase implements LocalDatabase {
   }
 }
 
-// Mock ConnectivityService
 class MockConnectivityService extends ConnectivityService {
   final List<ConnectivityResult> _status;
   
@@ -99,7 +96,6 @@ void main() {
       final repository = container.read(submissionRepositoryProvider);
       final syncEngine = container.read(syncEngineProvider);
 
-      // 1. Create a pending submission
       final submission = SubmissionModel(
         id: '456',
         formId: 'form_2',
@@ -109,26 +105,19 @@ void main() {
       );
       await repository.createSubmission(submission);
 
-      // 2. Trigger sync
       await syncEngine.syncData();
 
-      // 3. Verify status updated to synced (assuming simulated upload succeeds)
-      // Note: The simulated upload has a 10% fail chance, so this test might differ occasionally,
-      // but for 'unit' testing ideally we mock the upload part too. 
-      // For this integration-style test in this phase, we check if it changed or at least exists.
       final updated = await repository.getSubmission('456');
       
-      // It should be either synced or failed, but definitely not pending (unless loop failed to pick it up)
       expect(updated?.syncStatus, isNot(SyncStatus.pending));
     });
 
-    test('SubmissionController creates and saves submission', () async {
-      final controllerNotifier = container.read(submissionControllerProvider.notifier);
+    test('FormController creates and saves submission', () async {
+      final controller = container.read(formControllerProvider);
       
-      await controllerNotifier.submitForm(formId: 'form_3', data: {'test': 'data'});
+      await controller.submitForm('form_3', {'test': 'data'});
       
-      // Provide time for async operations to propagate
-      await Future.delayed(Duration(milliseconds: 100));
+      await Future.delayed(const Duration(milliseconds: 100));
 
       final repository = container.read(submissionRepositoryProvider);
       final pending = await repository.getAllSubmissions();

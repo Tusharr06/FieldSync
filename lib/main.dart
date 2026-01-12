@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'core/database/local_database.dart';
 import 'core/sync/sync_engine.dart';
+import 'features/forms/screens/form_list_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,14 +33,14 @@ class _FieldSyncAppState extends ConsumerState<FieldSyncApp> {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       title: 'FieldSync',
-      home: Scaffold(
-        body: Center(
-          child: Text('FieldSync Core Logic - Headless Mode\nCheck console for logs.'),
-        ),
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
+        useMaterial3: true,
       ),
+      home: const FormListScreen(),
     );
   }
 }
-
