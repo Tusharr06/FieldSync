@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../controller/submission_controller.dart';
-import '../models/submission_model.dart';
+
 
 class SubmissionScreen extends ConsumerWidget {
   const SubmissionScreen({super.key});
 
   @override
+  @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final submissionsAsyncValue = ref.watch(submissionsListProvider);
+    final submissionsAsyncValue = ref.watch(submissionControllerProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('My Submissions')),
@@ -22,8 +23,8 @@ class SubmissionScreen extends ConsumerWidget {
               final submission = submissions[index];
               return ListTile(
                 title: Text('Submission: ${submission.id}'),
-                subtitle: Text('Status: ${submission.status}'),
-                trailing: Text(submission.timestamp.toString().split(' ')[0]),
+                subtitle: Text('Status: ${submission.syncStatus.name}'),
+                trailing: Text(submission.createdAt.toString().split(' ')[0]),
               );
             },
           );
@@ -33,11 +34,11 @@ class SubmissionScreen extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          ref.read(submissionControllerProvider.notifier).createSubmission(
-            '1',
-            {'dummy': 'data'},
+          ref.read(submissionControllerProvider.notifier).submitForm(
+            formId: '1',
+            data: {'dummy': 'data'},
           );
-          ref.invalidate(submissionsListProvider);
+          // Controller invalidates itself in submitForm
         },
         child: const Icon(Icons.add),
       ),

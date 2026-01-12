@@ -1,40 +1,59 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/database/local_database.dart';
 import '../models/submission_model.dart';
-import '../../../core/database/local_database.dart';
 
-abstract class SubmissionRepository {
-  Future<void> saveSubmission(SubmissionModel submission);
-  Future<List<SubmissionModel>> getSubmissions();
-}
-
-class SubmissionRepositoryImpl implements SubmissionRepository {
+/// Repository for handling submission data operations.
+/// Encapsulates all data access logic, primarily interacting with the local database.
+class SubmissionRepository {
   final LocalDatabase _localDatabase;
+  static const String _boxName = 'submissions';
 
-  SubmissionRepositoryImpl(this._localDatabase);
+  SubmissionRepository(this._localDatabase);
 
-  @override
-  Future<void> saveSubmission(SubmissionModel submission) async {
-    await _localDatabase.save('submissions', submission.id, submission.toMap());
+  /// Saves a new submission to the local database.
+  /// Typically called when a user completes a form.
+  /// The submission is initially stored with SyncStatus.pending.
+  Future<void> createSubmission(SubmissionModel submission) async {
+    await _localDatabase.save(_boxName, submission.id, submission.toMap());
   }
 
-  @override
-  Future<List<SubmissionModel>> getSubmissions() async {
-    final maps = await _localDatabase.getAll('submissions');
-    if (maps.isEmpty) {
-        return [
-            SubmissionModel(
-                id: 'sub_1',
-                formId: '1',
-                data: {'location': 'Site A', 'inspector_name': 'John Doe'},
-                timestamp: DateTime.now(),
-                status: 'pending',
-            )
-        ];
+  /// Retrieves a specific submission by ID.
+  Future<SubmissionModel?> getSubmission(String id) async {
+    final data = await _localDatabase.get(_boxName, id);
+    if (data != null) {
+      return SubmissionModel.fromMap(data);
     }
-    return maps.map((e) => SubmissionModel.fromMap(e)).toList();
+    return null;
+  }
+
+  /// Retrieves all pending submissions that need to be synced.
+  Future<List<SubmissionModel>> getPendingSubmissions() async {
+    final allData = await _localDatabase.getAll(_boxName);
+    return allData
+        .map((data) => SubmissionModel.fromMap(data))
+        .where((submission) => submission.syncStatus == SyncStatus.pending)
+        .toList();
+  }
+
+  /// Updates the sync status of a submission.
+  /// Used by the SyncEngine to mark success or failure.
+  Future<void> updateSubmissionStatus(String id, SyncStatus status) async {
+    final submission = await getSubmission(id);
+    if (submission != null) {
+      final updatedSubmission = submission.copyWith(syncStatus: status);
+      await _localDatabase.save(_boxName, id, updatedSubmission.toMap());
+    }
+  }
+
+  /// Retrieves all submissions (for history/logs).
+  Future<List<SubmissionModel>> getAllSubmissions() async {
+    final allData = await _localDatabase.getAll(_boxName);
+    return allData.map((data) => SubmissionModel.fromMap(data)).toList();
   }
 }
 
+/// Provider for the SubmissionRepository.
 final submissionRepositoryProvider = Provider<SubmissionRepository>((ref) {
-  return SubmissionRepositoryImpl(ref.watch(localDatabaseProvider));
+  final localDatabase = ref.watch(localDatabaseProvider);
+  return SubmissionRepository(localDatabase);
 });
