@@ -12,7 +12,15 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  runApp(const ProviderScope(child: FieldSyncApp()));
+  final container = ProviderContainer();
+  await container.read(localDatabaseProvider).init();
+
+  runApp(
+    UncontrolledProviderScope(
+      container: container,
+      child: const FieldSyncApp(),
+    ),
+  );
 }
 
 class FieldSyncApp extends ConsumerStatefulWidget {
@@ -27,7 +35,6 @@ class _FieldSyncAppState extends ConsumerState<FieldSyncApp> {
   @override
   void initState() {
     super.initState();
-    ref.read(localDatabaseProvider).init();
     ref.read(syncEngineProvider).init();
   }
 

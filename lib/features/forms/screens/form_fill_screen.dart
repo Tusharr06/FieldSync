@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/form_model.dart';
 import '../controller/form_controller.dart';
+import '../../submissions/models/submission_model.dart';
 
 class FormFillScreen extends ConsumerStatefulWidget {
   final FormModel form;
@@ -31,15 +32,19 @@ class _FormFillScreenState extends ConsumerState<FormFillScreen> {
     super.dispose();
   }
 
-  Future<void> _submit() async {
+  Future<void> _submit({bool isDraft = false}) async {
     setState(() => _isSubmitting = true);
     final data = _controllers.map((key, value) => MapEntry(key, value.text));
     
     try {
-      await ref.read(formControllerProvider).submitForm(widget.form.id, data);
+      await ref.read(formControllerProvider).submitForm(
+        widget.form.id, 
+        data,
+        status: isDraft ? SyncStatus.draft : SyncStatus.pending,
+      );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Form saved locally!')),
+          SnackBar(content: Text(isDraft ? 'Draft saved!' : 'Form saved locally!')),
         );
         Navigator.pop(context);
       }
@@ -65,7 +70,7 @@ class _FormFillScreenState extends ConsumerState<FormFillScreen> {
         child: Column(
           children: [
             Expanded(
-              child: ListView(
+                child: Column(
                 children: widget.form.fields.map((field) {
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 16.0),
@@ -83,11 +88,24 @@ class _FormFillScreenState extends ConsumerState<FormFillScreen> {
             SizedBox(
               width: double.infinity,
               height: 50,
-              child: ElevatedButton(
-                onPressed: _isSubmitting ? null : _submit,
-                child: _isSubmitting 
-                    ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2)) 
-                    : const Text('Save Submission'),
+              child: Row(
+                 children: [
+                   Expanded(
+                     child: OutlinedButton(
+                       onPressed: _isSubmitting ? null : () => _submit(isDraft: true),
+                       child: const Text('Save Draft'),
+                     ),
+                   ),
+                   const SizedBox(width: 16),
+                   Expanded(
+                     child: ElevatedButton(
+                       onPressed: _isSubmitting ? null : () => _submit(isDraft: false),
+                       child: _isSubmitting 
+                           ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2)) 
+                           : const Text('Submit'),
+                     ),
+                   ),
+                 ],
               ),
             ),
           ],

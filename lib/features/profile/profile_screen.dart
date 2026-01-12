@@ -34,7 +34,7 @@ class ProfileScreen extends ConsumerWidget {
             const Divider(),
              SwitchListTile(
               title: const Text('Dark Mode'),
-              value: false, // Placeholder
+              value: false,
               onChanged: (val) {},
               secondary: const Icon(Icons.dark_mode),
             ),

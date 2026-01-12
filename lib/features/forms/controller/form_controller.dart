@@ -32,13 +32,13 @@ class FormController {
   final Ref _ref;
   FormController(this._ref);
 
-  Future<void> submitForm(String formId, Map<String, dynamic> data) async {
+  Future<void> submitForm(String formId, Map<String, dynamic> data, {SyncStatus status = SyncStatus.pending}) async {
     final submission = SubmissionModel(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       formId: formId,
       data: data,
       createdAt: DateTime.now(),
-      syncStatus: SyncStatus.pending,
+      syncStatus: status,
     );
     await _ref.read(submissionRepositoryProvider).createSubmission(submission);
   }

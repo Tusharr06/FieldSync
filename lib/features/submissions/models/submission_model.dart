@@ -1,16 +1,12 @@
 import 'dart:convert';
 
-/// Enum representing the synchronization status of a submission.
 enum SyncStatus {
+  draft,
   pending,
   synced,
   failed,
 }
 
-/// Model class representing a form submission.
-///
-/// Contains the data collected from the form, metadata like ID and creation time,
-/// and the current synchronization status.
 class SubmissionModel {
   final String id;
   final String formId;
@@ -26,7 +22,6 @@ class SubmissionModel {
     required this.syncStatus,
   });
 
-  /// Creates a copy of this submission with the given fields replaced with new values.
   SubmissionModel copyWith({
     String? id,
     String? formId,
@@ -43,18 +38,16 @@ class SubmissionModel {
     );
   }
 
-  /// Converts the submission to a Map for storage/JSON.
   Map<String, dynamic> toMap() {
     return {
       'id': id,
       'formId': formId,
       'data': data,
       'createdAt': createdAt.millisecondsSinceEpoch,
-      'syncStatus': syncStatus.toString(), // Store as string for Hive simplicity
+      'syncStatus': syncStatus.toString(), 
     };
   }
 
-  /// Creates a SubmissionModel from a Map.
   factory SubmissionModel.fromMap(Map<String, dynamic> map) {
     return SubmissionModel(
       id: map['id'] ?? '',

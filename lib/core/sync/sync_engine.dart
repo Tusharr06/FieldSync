@@ -44,6 +44,9 @@ class SyncEngine {
     print('SyncEngine: Found ${pendingSubmissions.length} pending submissions.');
 
     for (final submission in pendingSubmissions) {
+      if (submission.syncStatus == SyncStatus.draft) {
+        continue;
+      }
       await _processSubmission(repository, submission);
     }
     
