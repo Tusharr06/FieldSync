@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../features/auth/repository/auth_repository.dart';
 import '../../features/auth/screens/login_screen.dart';
-import '../../features/forms/screens/form_list_screen.dart';
+import '../navigation/app_shell.dart';
 
 class AuthWrapper extends ConsumerWidget {
   const AuthWrapper({super.key});
@@ -14,7 +14,7 @@ class AuthWrapper extends ConsumerWidget {
     return authState.when(
       data: (user) {
         if (user != null) {
-          return const FormListScreen();
+          return const AppShell();
         } else {
           return const LoginScreen();
         }
