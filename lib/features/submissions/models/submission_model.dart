@@ -10,6 +10,7 @@ enum SyncStatus {
 class SubmissionModel {
   final String id;
   final String formId;
+  final String? userId;
   final Map<String, dynamic> data;
   final DateTime createdAt;
   final SyncStatus syncStatus;
@@ -17,6 +18,7 @@ class SubmissionModel {
   const SubmissionModel({
     required this.id,
     required this.formId,
+    this.userId,
     required this.data,
     required this.createdAt,
     required this.syncStatus,
@@ -25,6 +27,7 @@ class SubmissionModel {
   SubmissionModel copyWith({
     String? id,
     String? formId,
+    String? userId,
     Map<String, dynamic>? data,
     DateTime? createdAt,
     SyncStatus? syncStatus,
@@ -32,6 +35,7 @@ class SubmissionModel {
     return SubmissionModel(
       id: id ?? this.id,
       formId: formId ?? this.formId,
+      userId: userId ?? this.userId,
       data: data ?? this.data,
       createdAt: createdAt ?? this.createdAt,
       syncStatus: syncStatus ?? this.syncStatus,
@@ -42,6 +46,7 @@ class SubmissionModel {
     return {
       'id': id,
       'formId': formId,
+      'userId': userId,
       'data': data,
       'createdAt': createdAt.millisecondsSinceEpoch,
       'syncStatus': syncStatus.toString(), 
@@ -52,6 +57,7 @@ class SubmissionModel {
     return SubmissionModel(
       id: map['id'] ?? '',
       formId: map['formId'] ?? '',
+      userId: map['userId'],
       data: Map<String, dynamic>.from(map['data'] ?? {}),
       createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt'] ?? 0),
       syncStatus: SyncStatus.values.firstWhere(

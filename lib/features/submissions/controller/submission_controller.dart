@@ -1,13 +1,23 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../models/submission_model.dart';
 import '../repository/submission_repository.dart';
 
 final submissionListProvider = StreamProvider.autoDispose<List<SubmissionModel>>((ref) async* {
   final repository = ref.watch(submissionRepositoryProvider);
+  final user = FirebaseAuth.instance.currentUser;
   
-  yield await repository.getAllSubmissions();
+  if (user == null) {
+    yield [];
+    return;
+  }
 
+  // Initial fetch
+  var initialList = await repository.getAllSubmissions();
+  yield initialList.where((s) => s.userId == user.uid).toList();
+
+  // Watch stream
   await for (final submissions in repository.watchSubmissions()) {
-    yield submissions;
+    yield submissions.where((s) => s.userId == user.uid).toList();
   }
 });

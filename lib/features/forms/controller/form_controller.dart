@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../models/form_model.dart';
 import '../models/form_field_model.dart';
 import '../repository/form_repository.dart';
@@ -51,9 +52,11 @@ class FormController {
   }
 
   Future<void> submitForm(String formId, Map<String, dynamic> data, {SyncStatus status = SyncStatus.pending}) async {
+    final user = FirebaseAuth.instance.currentUser;
     final submission = SubmissionModel(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       formId: formId,
+      userId: user?.uid,
       data: data,
       createdAt: DateTime.now(),
       syncStatus: status,
