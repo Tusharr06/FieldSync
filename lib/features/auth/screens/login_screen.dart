@@ -47,7 +47,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // A clean, minimal, industrial look.
+    
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -65,8 +65,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Spacer(flex: 1),
-                        // Big Bold Branding
-                        // Big Bold Branding
+                        
+                        
                         Container(
                           width: 80, 
                           height: 80,
@@ -106,7 +106,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         
                         const Spacer(flex: 2),
 
-                        // Minimal Inputs
+                        
                         _MinimalInput(
                           controller: _emailController,
                           hint: 'Email Address',
@@ -122,7 +122,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                         const SizedBox(height: 32),
 
-                        // Action Button
+                        
                         SizedBox(
                           width: double.infinity,
                           height: 56,
@@ -145,7 +145,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                         const SizedBox(height: 24),
 
-                        // Toggle
+                        
                         Center(
                           child: GestureDetector(
                             onTap: () => setState(() => _isLogin = !_isLogin),

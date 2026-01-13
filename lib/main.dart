@@ -69,7 +69,7 @@ class _FieldSyncAppState extends ConsumerState<FieldSyncApp> {
           iconTheme: IconThemeData(color: Colors.black),
         ),
         cardTheme: CardThemeData(
-          color: const Color(0xFFF5F5F7), // Light grey for subtle contrast
+          color: const Color(0xFFF5F5F7), 
           elevation: 0,
           margin: const EdgeInsets.symmetric(vertical: 8),
           shape: RoundedRectangleBorder(

@@ -12,11 +12,11 @@ final submissionListProvider = StreamProvider.autoDispose<List<SubmissionModel>>
     return;
   }
 
-  // Initial fetch
+  
   var initialList = await repository.getAllSubmissions();
   yield initialList.where((s) => s.userId == user.uid).toList();
 
-  // Watch stream
+  
   await for (final submissions in repository.watchSubmissions()) {
     yield submissions.where((s) => s.userId == user.uid).toList();
   }

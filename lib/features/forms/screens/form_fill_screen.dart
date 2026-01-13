@@ -21,7 +21,7 @@ class _FormFillScreenState extends ConsumerState<FormFillScreen> {
   @override
   void initState() {
     super.initState();
-    // Initialize defaults if needed
+    
   }
 
   Future<void> _submit({bool isDraft = false}) async {
@@ -179,7 +179,7 @@ class _FormFillScreenState extends ConsumerState<FormFillScreen> {
                       if (date != null) {
                         final val = date.toIso8601String().split('T')[0];
                         state.didChange(val);
-                        _formData[field.label] = val; // Direct save for UI update if needed
+                        _formData[field.label] = val; 
                       }
                     },
                     child: Text(state.value ?? 'Select Date'),
@@ -190,7 +190,7 @@ class _FormFillScreenState extends ConsumerState<FormFillScreen> {
           },
         );
       case FieldType.photo:
-         // Placeholder for Photo - Using simple text for value for now
+         
         return FormField<String>(
            onSaved: (value) => _formData[field.label] = value,
            builder: (state) {

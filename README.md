@@ -1,16 +1,70 @@
-# fieldsync
+# FieldSync
 
-A new Flutter project.
+**FieldSync** is a modern, offline-first field data collection application built with Flutter. It allows users to design custom forms, collect data in remote areas without internet access, and sync everything securely to the cloud when online.
 
-## Getting Started
+<p align="center">
+  <img src="assets/icon/app_icon.png" width="120" alt="FieldSync Logo" />
+</p>
 
-This project is a starting point for a Flutter application.
+## 🚀 Features
 
-A few resources to get you started if this is your first Flutter project:
+*   **Offline-First Architecture**: Built from the ground up to work without an internet connection. Data is stored locally (using Hive) and synced automatically when a connection is restored.
+*   **Dynamic Form Builder**: Support for various field types (Text, Number, Date, Photo, GPS Location, Dropdowns).
+*   **Account Scoping**: User data is strictly isolated. Users only see and manage their own submissions.
+*   **Modern UI/UX**: A minimalist, "Industrial" design aesthetic with high contrast, bold typography, and smooth animations.
+*   **Excel Export**: Export collected data to Excel sheets for reporting and analysis.
+*   **Photo Evidence**: Capture and attach photos directly to form submissions.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## 🛠 Tech Stack
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+*   **Framework**: Flutter (Dart)
+*   **State Management**: Riverpod
+*   **Local Database**: Hive (NoSQL, fast, lightweight)
+*   **Backend**: Firebase (Auth, Firestore, Storage)
+*   **Connectivity**: `connectivity_plus` for network state monitoring.
+*   **Architecture**: Feature-first, Repository Pattern.
+
+## 📂 Project Structure
+
+```
+lib/
+├── core/            # Shared utilities (Database, Network, Theme, Routing)
+├── features/        # Feature modules
+│   ├── auth/        # Login, Sign Up, User Management
+│   ├── forms/       # Form Builder, Detail, and Fill Screens
+│   ├── profile/     # User Profile & Stats
+│   └── submissions/ # Submission Management, History, Sync Logic
+└── main.dart        # App Entry Point & Global Config
+```
+
+## 🏁 Getting Started
+
+1.  **Prerequisites**:
+    *   Flutter SDK (3.9.2 or higher)
+    *   Dart SDK
+    *   Firebase Project configured
+
+2.  **Installation**:
+    ```bash
+    flutter pub get
+    ```
+
+3.  **Run the App**:
+    ```bash
+    flutter run
+    ```
+
+4.  **Build Release**:
+    ```bash
+    flutter build apk --release
+    ```
+
+## 🔒 Security
+
+*   **Firebase Auth**: Secure email/password authentication.
+*   **Data Isolation**: Submissions are tagged with `userId` and filtered at the controller level.
+*   **Local Encryption**: (Optional future enhancement for Hive boxes).
+
+## 📄 License
+
+This specific implementation is proprietary.

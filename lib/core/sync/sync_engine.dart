@@ -44,7 +44,7 @@ class SyncEngine {
     try {
       await _ref.read(formRepositoryProvider).syncForms();
     } catch (e) {
-      // ignore: avoid_print
+      
       print('Sync failed: $e');
     }
   }

@@ -42,7 +42,7 @@ class ProfileScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: 48),
 
-                        // User Info Card
+                        
                         Container(
                           width: double.infinity,
                           padding: const EdgeInsets.all(24),
@@ -89,7 +89,7 @@ class ProfileScreen extends ConsumerWidget {
 
                         const SizedBox(height: 16),
 
-                        // Stats Row
+                        
                         IntrinsicHeight(
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -114,7 +114,7 @@ class ProfileScreen extends ConsumerWidget {
                                      );
                                   },
                                   child: Container(
-                                    // Removed fixed height: 120
+                                    
                                     padding: const EdgeInsets.all(24),
                                     decoration: BoxDecoration(
                                       color: Colors.black,
@@ -125,7 +125,7 @@ class ProfileScreen extends ConsumerWidget {
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                          Icon(Icons.sync, color: Colors.white, size: 28),
-                                         SizedBox(height: 16), // Add spacer instead of fixed height reliance
+                                         SizedBox(height: 16), 
                                          Text(
                                            'Sync\nNow',
                                            style: TextStyle(
@@ -145,7 +145,7 @@ class ProfileScreen extends ConsumerWidget {
 
                         const Spacer(),
 
-                        // Logout Button
+                        
                         SizedBox(
                           width: double.infinity,
                           height: 56,
@@ -197,7 +197,7 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      // Removed fixed height: 120
+      
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: const Color(0xFFF5F5F7),
@@ -216,7 +216,7 @@ class _StatCard extends StatelessWidget {
               height: 1.0,
             ),
           ),
-          const SizedBox(height: 16), // Spacer for visual balance
+          const SizedBox(height: 16), 
           Text(
             label,
             style: TextStyle(

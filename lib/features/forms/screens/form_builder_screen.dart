@@ -215,7 +215,7 @@ class _FieldEditorDialogState extends State<_FieldEditorDialog> {
             }
             
             Navigator.pop(context, FormFieldModel(
-              id: widget.field.id, // Keep ID
+              id: widget.field.id, 
               label: _labelController.text,
               type: _type,
               required: _required,

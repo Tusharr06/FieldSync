@@ -21,7 +21,7 @@ class _FormDetailScreenState extends ConsumerState<FormDetailScreen> {
     setState(() => _isExporting = true);
     
     try {
-      // 1. Get submissions for this form
+      
       final allSubmissions = await ref.read(submissionListProvider.future);
       final formSubmissions = allSubmissions.where((s) => s.formId == widget.form.id).toList();
 
@@ -34,10 +34,10 @@ class _FormDetailScreenState extends ConsumerState<FormDetailScreen> {
         return;
       }
 
-      // 2. Generate Excel
+      
       final filePath = await ref.read(excelExportServiceProvider).exportFormSubmissions(widget.form, formSubmissions);
 
-      // 3. Share File
+      
       await Share.shareXFiles([XFile(filePath)], text: 'Export for ${widget.form.title}');
       
     } catch (e) {
@@ -53,7 +53,7 @@ class _FormDetailScreenState extends ConsumerState<FormDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Watch submissions to show stats
+    
     final submissionsAsync = ref.watch(submissionListProvider);
 
     return Scaffold(
@@ -77,7 +77,7 @@ class _FormDetailScreenState extends ConsumerState<FormDetailScreen> {
             Text(widget.form.description, style: Theme.of(context).textTheme.bodyLarge),
             const SizedBox(height: 24),
             
-            // Stats Card
+            
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
