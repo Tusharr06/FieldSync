@@ -66,14 +66,22 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       children: [
                         const Spacer(flex: 1),
                         // Big Bold Branding
+                        // Big Bold Branding
                         Container(
-                          width: 60,
-                          height: 60,
+                          width: 80, 
+                          height: 80,
                           decoration: BoxDecoration(
                             color: Colors.black,
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(20),
                           ),
-                          child: const Icon(Icons.sync_alt, color: Colors.white, size: 32),
+                          padding: const EdgeInsets.all(12),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.asset(
+                              'assets/icon/app_icon.png',
+                              fit: BoxFit.contain, 
+                            ),
+                          ),
                         ),
                         const SizedBox(height: 24),
                         const Text(

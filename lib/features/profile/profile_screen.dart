@@ -197,7 +197,7 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 120,
+      // Removed fixed height: 120
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: const Color(0xFFF5F5F7),
@@ -216,6 +216,7 @@ class _StatCard extends StatelessWidget {
               height: 1.0,
             ),
           ),
+          const SizedBox(height: 16), // Spacer for visual balance
           Text(
             label,
             style: TextStyle(
