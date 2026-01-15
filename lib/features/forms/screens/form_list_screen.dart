@@ -34,6 +34,17 @@ class FormListScreen extends ConsumerWidget {
               ),
             ),
           IconButton(
+            icon: const Icon(Icons.account_balance),
+            tooltip: 'Load Government Forms',
+            onPressed: () {
+               ref.read(formControllerProvider).seedGovernmentForms();
+               ScaffoldMessenger.of(context).showSnackBar(
+                 const SnackBar(content: Text('Government forms loaded! Refreshing...')),
+               );
+               ref.invalidate(formListProvider);
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.bug_report),
             tooltip: 'Seed Sample Data',
             onPressed: () {
@@ -80,30 +91,71 @@ class FormListScreen extends ConsumerWidget {
             itemCount: forms.length,
             itemBuilder: (context, index) {
               final form = forms[index];
-              return Card(
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: ListTile(
-                  title: Text(form.title, style: const TextStyle(fontWeight: FontWeight.bold)),
-                  subtitle: Text(form.description),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                       if (!form.isSynced)
-                         const Padding(
-                           padding: EdgeInsets.only(right: 8.0),
-                           child: Icon(Icons.cloud_off, color: Colors.orange, size: 20),
-                         ),
-                       const Icon(Icons.arrow_forward_ios, size: 16),
-                    ],
+              return Dismissible(
+                key: Key(form.id),
+                direction: DismissDirection.endToStart,
+                background: Container(
+                  alignment: Alignment.centerRight,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  color: Colors.red,
+                  child: const Icon(Icons.delete, color: Colors.white, size: 32),
+                ),
+                confirmDismiss: (direction) async {
+                  return await showDialog<bool>(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: const Text('Confirm Delete'),
+                        content: Text('Are you sure you want to delete "${form.title}"?'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(false),
+                            child: const Text('Cancel'),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(true),
+                            style: TextButton.styleFrom(foregroundColor: Colors.red),
+                            child: const Text('Delete'),
+                          ),
+                        ],
+                      );
+                    },
+                  ) ?? false;
+                },
+                onDismissed: (direction) {
+                  ref.read(formControllerProvider).deleteForm(form.id);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('${form.title} deleted'),
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                },
+                child: Card(
+                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: ListTile(
+                    title: Text(form.title, style: const TextStyle(fontWeight: FontWeight.bold)),
+                    subtitle: Text(form.description),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                         if (!form.isSynced)
+                           const Padding(
+                             padding: EdgeInsets.only(right: 8.0),
+                             child: Icon(Icons.cloud_off, color: Colors.orange, size: 20),
+                           ),
+                         const Icon(Icons.arrow_forward_ios, size: 16),
+                      ],
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => FormDetailScreen(form: form),
+                        ),
+                      );
+                    },
                   ),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => FormDetailScreen(form: form),
-                      ),
-                    );
-                  },
                 ),
               );
             },

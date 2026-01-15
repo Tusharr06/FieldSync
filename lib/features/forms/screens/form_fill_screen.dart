@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geolocator/geolocator.dart';
 import '../models/form_model.dart';
 import '../models/form_field_model.dart';
 import '../controller/form_controller.dart';
@@ -203,8 +204,7 @@ class _FormFillScreenState extends ConsumerState<FormFillScreen> {
                  children: [
                    const Icon(Icons.camera_alt),
                    const SizedBox(width: 8),
-                   Text(state.value ?? 'No photo selected'),
-                   const Spacer(),
+                   Expanded(child: Text(state.value ?? 'No photo selected', overflow: TextOverflow.ellipsis)),
                    TextButton(
                      onPressed: () {
                        final val = 'photo_${DateTime.now().millisecondsSinceEpoch}.jpg';
@@ -216,6 +216,57 @@ class _FormFillScreenState extends ConsumerState<FormFillScreen> {
                ),
              );
            }
+        );
+      case FieldType.location:
+        return FormField<String>(
+           onSaved: (value) => _formData[field.label] = value,
+           builder: (state) {
+              return InputDecorator(
+                decoration: InputDecoration(
+                  labelText: field.label + (field.required ? ' *' : ''),
+                  border: const OutlineInputBorder(),
+                  errorText: state.errorText,
+                ),
+                child: Row(
+                   children: [
+                     const Icon(Icons.location_on, color: Colors.red),
+                     const SizedBox(width: 8),
+                     Expanded(child: Text(state.value ?? 'No location data', style: TextStyle(color: state.value == null ? Colors.grey : Colors.black))),
+                     IconButton(
+                       icon: const Icon(Icons.my_location),
+                       onPressed: () async {
+                          try {
+                            bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+                            if (!context.mounted) return;
+                            if (!serviceEnabled) {
+                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Location services are disabled.')));
+                              return;
+                            }
+                            
+                            LocationPermission permission = await Geolocator.checkPermission();
+                            if (permission == LocationPermission.denied) {
+                              permission = await Geolocator.requestPermission();
+                              if (permission == LocationPermission.denied) return;
+                            }
+                            
+                            if (permission == LocationPermission.deniedForever) return;
+
+                            final pos = await Geolocator.getCurrentPosition();
+                            final val = '${pos.latitude},${pos.longitude}';
+                            state.didChange(val);
+                          } catch (e) {
+                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error getting location: $e')));
+                          }
+                       },
+                     ),
+                   ],
+                ),
+              );
+           },
+           validator: (value) {
+              if (field.required && (value == null || value.isEmpty)) return 'Required';
+              return null;
+           },
         );
     }
   }

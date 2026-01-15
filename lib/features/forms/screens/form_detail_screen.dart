@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 import '../models/form_model.dart';
+import '../controller/form_controller.dart';
 import '../../submissions/controller/submission_controller.dart';
 import '../../../core/export/excel_export_service.dart';
 import 'form_fill_screen.dart';
@@ -60,6 +61,42 @@ class _FormDetailScreenState extends ConsumerState<FormDetailScreen> {
       appBar: AppBar(
         title: Text(widget.form.title),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.delete),
+            tooltip: 'Delete Form',
+            onPressed: () async {
+              final confirmed = await showDialog<bool>(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: const Text('Confirm Delete'),
+                    content: Text('Are you sure you want to delete "${widget.form.title}"? This will also delete all submissions for this form.'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(true),
+                        style: TextButton.styleFrom(foregroundColor: Colors.red),
+                        child: const Text('Delete'),
+                      ),
+                    ],
+                  );
+                },
+              );
+              
+              if (confirmed == true && mounted) {
+                await ref.read(formControllerProvider).deleteForm(widget.form.id);
+                if (mounted) {
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('${widget.form.title} deleted')),
+                  );
+                }
+              }
+            },
+          ),
           IconButton(
             icon: _isExporting 
              ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) 

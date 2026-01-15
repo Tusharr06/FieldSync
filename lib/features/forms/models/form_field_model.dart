@@ -4,6 +4,7 @@ enum FieldType {
   dropdown,
   date,
   photo,
+  location,
 }
 
 class FormFieldModel {
